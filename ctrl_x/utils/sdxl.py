@@ -7,35 +7,37 @@ import torch.nn.functional as F
 
 from .feature import *
 from .utils import *
+from .my_utils import *
 
 
 def get_control_config(structure_schedule, appearance_schedule):
-    s = structure_schedule
-    a = appearance_schedule
-    
-    control_config =\
+   s = structure_schedule
+   a = appearance_schedule
+  
+   control_config =\
 f"""control_schedule:
-    #       structure_conv   structure_attn   appearance_attn  conv/attn
-    encoder:                                                # (num layers)
-        0: [[             ], [             ], [             ]]  # 2/0
-        1: [[             ], [             ], [{a}, {a}     ]]  # 2/2
-        2: [[             ], [             ], [{a}, {a}     ]]  # 2/2
-    middle: [[            ], [             ], [             ]]  # 2/1
-    decoder:
-        0: [[{s}          ], [{s}, {s}, {s}], [0.0, {a}, {a}]]  # 3/3
-        1: [[             ], [             ], [{a}, {a}     ]]  # 3/3
-        2: [[             ], [             ], [             ]]  # 3/0
+  #       structure_conv   structure_attn   appearance_attn  conv/attn
+  encoder:                                                # (num layers)
+      0: [[             ], [             ], [             ]]  # 2/0
+      1: [[             ], [             ], [{a}, {a}     ]]  # 2/2
+      2: [[             ], [             ], [{a}, {a}     ]]  # 2/2
+  middle: [[            ], [             ], [             ]]  # 2/1
+  decoder:
+      0: [[{s}, {s}, {s}], [{s}, {s}, {s}], [{0}, {a}, {a}]]  # 3/3
+      1: [[{s}, {s}, {s}], [{s}, {s}, {s}], [{a}, {a}     ]]  # 3/3
+      2: [[{0}          ], [{0}          ], [{0}          ]]  # 3/0
+
 
 control_target:
-    - [output_tensor]  # structure_conv   choices: {{hidden_states, output_tensor}}
-    - [query, key]     # structure_attn   choices: {{query, key, value}}
-    - [before]         # appearance_attn  choices: {{before, value, after}}
+   - [output_tensor]  # structure_conv   choices: {{hidden_states, output_tensor}}
+   - [query, key]     # structure_attn   choices: {{query, key, value}}
+   - [before]         # appearance_attn  choices: {{before, value, after}}
+
 
 self_recurrence_schedule:
-    - [0.1, 0.5, 2]  # format: [start, end, num_recurrence]"""
-    
-    return control_config
-
+   - [0.1, 0.5, 2]  # format: [start, end, num_recurrence]"""
+  
+   return control_config
 
 def convolution_forward(  # From <class 'diffusers.models.resnet.ResnetBlock2D'>, forward (diffusers==0.28.0)
     self,
@@ -220,7 +222,7 @@ class AttnProcessor2_0:  # From <class 'diffusers.models.attention_processor.Att
             hidden_states = appearance_transfer(hidden_states, query_normed, key_normed, batch_order=attn.batch_order)
 
         hidden_states = hidden_states.transpose(1, 2).reshape(batch_size, -1, attn.heads * head_dim)
-        hidden_states = hidden_states.to(query.dtype)
+        hidden_states = hidden_states.to(query.dtype) # [4, 1024, 1280] = [B, HW, C]
 
         # Linear projection
         hidden_states = attn.to_out[0](hidden_states, *args)

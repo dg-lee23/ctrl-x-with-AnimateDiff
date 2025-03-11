@@ -1,0 +1,12 @@
+# ! README
+# you can optionally set:
+  # - appearance_video_path: "./assets/videos/arctic_fox_static.mp4"
+  # - appearance_prompt: "an arctic fox"
+  # after using img_converter_static.py to convert arctic_fox.jpg 
+# or just forget about the appearance-related part; see https://arxiv.org/pdf/2406.07540, pg.9, "Extension to prompt-driven conditional generation"
+
+structure_video_path: "./assets/videos/retriever.mp4"
+appearance_video_path: ""
+prompt: "Arctic fox turning its head in the snow"
+structure_prompt: "a retriever turning its head on a couch"
+appearance_prompt: ""

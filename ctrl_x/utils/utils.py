@@ -44,6 +44,7 @@ def batch_dict_to_tensor(batch_dict, batch_order):
     batch_tensor = []
     for batch_type in batch_order:
         batch_tensor.append(batch_dict[batch_type])
+    
     batch_tensor = torch.cat(batch_tensor, dim=0)
     return batch_tensor
 

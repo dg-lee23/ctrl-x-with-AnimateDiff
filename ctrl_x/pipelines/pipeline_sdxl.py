@@ -86,10 +86,10 @@ class CtrlXStableDiffusionXLPipeline(StableDiffusionXLPipeline):  # diffusers==0
 
         image = image.to(device=device, dtype=dtype)
 
-        if image.shape[1] == 4:  # Image already in latents form
+        if image.shape[1] == 4:  # Image already in latents form, C=4
             init_latents = image
 
-        else:
+        else: # otherwise, pass through VAE
             # Make sure the VAE is in float32 mode, as it overflows in float16
             if self.vae.config.force_upcast:
                 image = image.to(torch.float32)
